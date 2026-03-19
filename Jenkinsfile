@@ -1,32 +1,32 @@
 pipeline {
     agent any
     tools {
-        jdk 'java21'
-        maven 'maven3' // Ensure Maven is installed and configured in Jenkins
+        maven 'maven1'
+        jdk 'java1'
     }
     stages {
         stage('Download') {
             steps {
-                echo "Download Code from Github"
-                git branch: 'main', url: 'https://github.com/bheesham-devops/maven-jenkins10.git'
+                echo "downloading the code"
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/modh-tirth/maven-jenkins10.git']])
             }
         }
-        stage('Build') {
+        stage('build') {
             steps {
-                echo "Build the Application"
+                echo "building the code"
                 sh 'mvn clean package'
             }
         }
-        stage('Archive') {
+        stage('copy artifact') {
             steps {
-                echo "Archive the Application Artifacts"
+                echo "copying the artifact"
                 archiveArtifacts artifacts: '**/*.war', followSymlinks: false
             }
         }
-        stage('Trigger Deploy Job') {
+        stage('build other job') {
             steps {
-                echo "Trigger Deploy Job"
-               build wait: false, job: 'deploy-pipeline'
+                echo "building other job"
+                build wait: false, job: 'depoly-pipline'
             }
         }
     }
